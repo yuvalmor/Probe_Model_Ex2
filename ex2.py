@@ -1,7 +1,9 @@
 import sys
 from collections import Counter
 
+from held_out import held_out
 from lidstone import lidstone
+from utils import voc_size
 
 
 def is_header(text):
@@ -27,7 +29,6 @@ def float_range(start, end, step):
         current += step
 
 
-voc_size = 300000  # given
 """ init - part 1 """
 print("Output1:", sys.argv[1], sep="\t")
 print("Output2:", sys.argv[2], sep="\t")
@@ -79,4 +80,30 @@ for lam_val in lidstone_models:
     ):
         best_lambda = lam_val
 print("Output19:", best_lambda, sep="\t")
-print("Output19:", lidstone_models[best_lambda]["perplexity"], sep="\t")
+print("Output20:", lidstone_models[best_lambda]["perplexity"], sep="\t")
+
+held = held_out(content)
+print("Output21:", len(held.train), sep="\t")
+print("Output22:", len(held.held), sep="\t")
+print("Output23:", held.get_prob(sys.argv[3]), sep="\t")
+print("Output24:", held.get_prob("unseen-word"), sep="\t")
+### TEST HERE!!!!!!!!!!!!!!!!!!!! ###
+
+
+content_test = parse_file(sys.argv[2])  # parse test file
+print("Output25:", len(content_test), sep="\t")
+print(
+    "Output26:",
+    lidstone_models[best_lambda]["model"].get_perplexity(content_test),
+    sep="\t",
+)
+print("Output27:", held.get_perplexity(content_test), sep="\t")
+
+print(
+    "Output28:",
+    "H"
+    if held.get_perplexity(content_test)
+    < lidstone_models[best_lambda]["model"].get_perplexity(content_test)
+    else "L",
+    sep="\t",
+)
