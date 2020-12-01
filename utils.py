@@ -14,3 +14,11 @@ def perplexity(model, data):
     sum_probs = reduce(lambda a, b: a + b, probs_log)
     power_val = -sum_probs / len(data)
     return 2 ** power_val
+
+
+def sum_model_probs(model, uniq_words):
+    sum = 0
+    for word in uniq_words:
+        sum += model.get_prob(word)
+    sum += (voc_size - len(uniq_words)) * model.get_prob_by_word_freq(0)
+    return sum
