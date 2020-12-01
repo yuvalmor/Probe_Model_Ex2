@@ -107,3 +107,12 @@ print(
     else "L",
     sep="\t",
 )
+for i in range(10):
+    print(
+        i,
+        round(lidstone_models[best_lambda]["model"].get_est_freq_by_freq(i), 5),
+        round(held.get_est_freq_by_freq(i), 5),
+        round(held.Nr[i], 5),
+        round(held.tr[i], 5),
+        sep="\t",
+    )
