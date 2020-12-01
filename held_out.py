@@ -23,8 +23,13 @@ class held_out:
                 self.tr[0] += count
 
     def get_prob(self, word):
-        word_r = self.r[word]
-        return self.tr[word_r] / (self.Nr[word_r] * len(self.held))
+        return self.get_prob_by_word_freq(self.r[word])
+
+    def get_prob_by_word_freq(self, r):
+        return self.tr[r] / (self.Nr[r] * len(self.held))
+
+    def get_est_freq_by_freq(self, r):
+        return self.get_prob_by_word_freq(r) * len(self.train)
 
     def get_perplexity(self, data):
         return perplexity(self, data)
