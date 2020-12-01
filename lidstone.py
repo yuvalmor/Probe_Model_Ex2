@@ -22,3 +22,10 @@ class lidstone:
 
     def get_perplexity(self, data):
         return perplexity(self, data)
+
+    def sum_model_probs(self):
+        sum = 0
+        for uniq_word in self.counter_words:
+            sum += self.get_prob(uniq_word)
+        sum += (voc_size - len(self.counter_words)) * self.get_prob_by_word_freq(0)
+        return sum
