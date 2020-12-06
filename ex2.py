@@ -1,3 +1,4 @@
+""" Yuval mor, Roey Fuchs 205380173, 205415342 """
 import sys
 from collections import Counter
 
@@ -25,26 +26,32 @@ def parse_file(file_name):
 
 
 def float_range(start, end, step):
+    """ like range() function, but works with float """
     current = start
     while current <= end:
         yield round(current, 2)
         current += step
 
 
-f = open(sys.argv[4], "w")
+dev_set_file = sys.argv[1]
+test_set_file = sys.argv[2]
+input_word = sys.argv[3]
+out_file = sys.argv[4]
+
+f = open(out_file, "w")
 print(
     "#Students", "Yuval Mor", "Roey Fuchs", "205380173", "205415342", sep="\t", file=f
 )
 """ init - part 1 """
-print("#Output1", sys.argv[1], sep="\t", file=f)
-print("#Output2", sys.argv[2], sep="\t", file=f)
-print("#Output3", sys.argv[3], sep="\t", file=f)
-print("#Output4", sys.argv[4], sep="\t", file=f)
+print("#Output1", dev_set_file, sep="\t", file=f)
+print("#Output2", test_set_file, sep="\t", file=f)
+print("#Output3", input_word, sep="\t", file=f)
+print("#Output4", out_file, sep="\t", file=f)
 print("#Output5", voc_size, sep="\t", file=f)
 print("#Output6", 1 / voc_size, sep="\t", file=f)  # uniform distribution
 
 """ Development set preprocessing - part 2 """
-content = parse_file(sys.argv[1])  # parse dev file
+content = parse_file(dev_set_file)  # parse dev file
 number_of_words = len(content)
 print("#Output7", number_of_words, sep="\t", file=f)
 
@@ -62,23 +69,24 @@ print(
     "#Output10", len(training_counter), sep="\t", file=f
 )  # different events in the trainign set
 print(
-    "#Output11", training_counter[sys.argv[3]], sep="\t", file=f
+    "#Output11", training_counter[input_word], sep="\t", file=f
 )  # number of times of input word
 
 
 lidstone_models = {}
+# create lidstine models with diffrents lambda
 for lambda_val in float_range(0, 2, 0.01):
     model = lidstone(training_counter, training, lambda_val)
     perp = model.get_perplexity(vald)
     lidstone_models[lambda_val] = {"model": model, "perplexity": perp}
 
 
-print("#Output12", lidstone_models[0]["model"].get_prob(sys.argv[3]), sep="\t", file=f)
+print("#Output12", lidstone_models[0]["model"].get_prob(input_word), sep="\t", file=f)
 print(
     "#Output13", lidstone_models[0]["model"].get_prob("unseen-word"), sep="\t", file=f
 )
 print(
-    "#Output14", lidstone_models[0.10]["model"].get_prob(sys.argv[3]), sep="\t", file=f
+    "#Output14", lidstone_models[0.10]["model"].get_prob(input_word), sep="\t", file=f
 )
 print(
     "#Output15",
@@ -99,13 +107,14 @@ for lam_val in lidstone_models:
 print("#Output19", best_lambda, sep="\t", file=f)
 print("#Output20", lidstone_models[best_lambda]["perplexity"], sep="\t", file=f)
 
+""" Held out model - part 4 """
 held = held_out(content)
 print("#Output21", len(held.train), sep="\t", file=f)
 print("#Output22", len(held.held), sep="\t", file=f)
-print("#Output23", held.get_prob(sys.argv[3]), sep="\t", file=f)
+print("#Output23", held.get_prob(input_word), sep="\t", file=f)
 print("#Output24", held.get_prob("unseen-word"), sep="\t", file=f)
 
-""" debug code - part 5 """
+""" Debug code - part 5 """
 if DEBUG:
     print(
         "DEBUG LIDSTONE",
@@ -116,8 +125,8 @@ if DEBUG:
         file=f,
     )
     print("DEBUG HELD OUT", sum_model_probs(held, held.r), file=f)
-""" test - part 6 """
-content_test = parse_file(sys.argv[2])  # parse test file
+""" Test - part 6 """
+content_test = parse_file(test_set_file)  # parse test file
 print("#Output25", len(content_test), sep="\t", file=f)
 print(
     "#Output26",
@@ -136,13 +145,17 @@ print(
     sep="\t",
     file=f,
 )
+print("#Output29", file=f)
+round_digits = 5
 for i in range(10):
     print(
         i,
-        round(lidstone_models[best_lambda]["model"].get_est_freq_by_freq(i), 5),
-        round(held.get_est_freq_by_freq(i), 5),
-        round(held.Nr[i], 5),
-        round(held.tr[i], 5),
+        round(
+            lidstone_models[best_lambda]["model"].get_est_freq_by_freq(i), round_digits
+        ),
+        round(held.get_est_freq_by_freq(i), round_digits),
+        round(held.Nr[i], round_digits),
+        round(held.tr[i], round_digits),
         sep="\t",
         file=f,
     )
